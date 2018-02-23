@@ -3,6 +3,7 @@ Asteroids redux loosly based in Voltron universe, for Sammy.
 
 
 ## TO DO:
+- Add HUD to space transition
 - Integrate space transition
 - Add galaxy view
 - Add planet overflight mode
