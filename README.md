@@ -12,3 +12,4 @@ Asteroids redux loosly based in Voltron universe, for Sammy.
 - ~Move asteroids to own file~
 - ~Model life points for asteroids~
 - Add wpn to enemy ships
+- Remove velocity effects on lasers
