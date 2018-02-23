@@ -15,7 +15,7 @@ function PlayerShip(x, y, enginePwr, maxSpeed) {
     this.enginePwr = enginePwr || 1;
     this.maxSpeed = maxSpeed || 60;
     this.pwr = 1000;
-    this.fireRate = 200         //one shot every x milliseconds
+    this.fireRate = 150         //one shot every x milliseconds
     this.pwrStr =  function () {///visual representation of pwr
         if (this.pwr <= 0) return "          "; //No power
         for (var power = ""; power.length < this.pwr/100; power+="|") {}

@@ -9,6 +9,6 @@ Asteroids redux loosly based in Voltron universe, for Sammy.
 - Add galaxy view
 - Add planet overflight mode
 - Add other weapon types to ship.js
-- Move asteroids to own file
+- ~Move asteroids to own file~
+- ~Model life points for asteroids~
 - Add wpn to enemy ships
-- Model life points

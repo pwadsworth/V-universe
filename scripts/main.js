@@ -18,7 +18,7 @@ var astrdMaxSpeed = 1,  //Asteroids max speed factor (x200 m/s)
     };
 
 //GLOBAL SETUP
-var DEBUG = false,         //Debug mode toggle
+var DEBUG = true,         //Debug mode toggle
     utils = new Utils(),
     canvas = document.getElementById('myCanvas'),
     width = window.innerWidth - 25,
@@ -34,11 +34,11 @@ canvas.height = height;
 
 /////////////MODEL/////////////
 var model = {
-    tester: new EnemyCorvette(100, 100, 180),
-
     ship: new PlayerShip(width/5, height/2, enginePwr, maxSpeed),
 
     lastCharge: 0,
+
+    enemies: [],
 
     laserBeams: [],
 
@@ -77,24 +77,19 @@ function view() {
     ctx.save();
 
     //Draw game elements
-    model.tester.renderIn(ctx);  //test
     model.ship.renderIn(ctx);
     model.asteroids.forEach(function (a) {a.renderIn(ctx)})
-
+    model.enemies.forEach(function (e)  {e.renderIn(ctx)})
     drawBeams();
-   // drawAsteroids();
     drawHUD();
 
     function drawBeams() {
-
         var beams = model.laserBeams;
-
         ctx.fillStyle = "red";
         beams.forEach(function (b) {
-            ctx.fillRect(b.position.x, b.position.y, 2, 2)
+            ctx.fillRect(b.position.x, b.position.y, 4, 4)
         });
        ctx.restore();
-
     }
 
     function drawHUD() {
@@ -110,50 +105,37 @@ function view() {
         ctx.fillText(s.pressedKeys.lastKey, width / 2, 20)
         ctx.restore();
     }
-
-    function drawAsteroids() {
-        var astrds = model.asteroids;
-        ctx.fillStyle = 'gray';
-        astrds.forEach(function (astrd) {
-            ctx.save();
-            ctx.rotate(utils.toRadian(astrd.rotation));
-            outline(astrd.shape)
-            ctx.fill();
-            ctx.restore();
-        });
-        ctx.restore();
-    }
-
-    function outline(shape, _initX, _initY) {
-        ctx.beginPath();
-        ctx.moveTo(_initX || 0, _initY || 0)
-        shape.forEach(function (point) {
-            ctx.lineTo(point[0], point[1]);
-        });
-        ctx.closePath();
-    }
 }
 
-
-var theForce = new Vector(2, 0);         // test
-model.tester.acceleration = theForce;    // test
+////////////////TEST
+for (var i = 0; i<5; i++){         
+  model.enemies.push(new EnemyCorvette(10*i, 50*(i+1), 180))
+  var theForce = new Vector(2, 0);  
+  model.enemies[i].acceleration = theForce;  
+}
 
 /////////////CONTROLER/////////////
 function controller(progress) {
     var p = progress / 16
     var s = model.ship
 
-    model.tester.update();               //test
     model.ship.update(p);
     updateBeams();
     updateAsteroids()
+    updateEnemies();
+    if (s.pressedKeys.fireWpn && s.pwr > 50) {
+        var b = s.fire();
+        if (b) model.laserBeams.push(b);
+    }
     CleanOutOfFrame();
 
-    function updateBeams(p) {
-        if (s.pressedKeys.fireWpn && s.pwr > 50) {
-            var b = s.fire();
-            if (b) model.laserBeams.push(b);
+    function updateEnemies() {
+        for (var i = 0; i<model.enemies.length; i++){      
+            model.enemies[i].update();       
         }
+    }
+
+    function updateBeams(p) {
         model.laserBeams.forEach(function (beam) {
             if (beam) {
                 beam.position = beam.position.add(beam.velocity);
@@ -170,29 +152,19 @@ function controller(progress) {
 
         if ((time - model.lastAsteroidCreation) > AsteroidsF * 1000) {
             var a = new Asteroid();
-            a.velocity.x = -randomNum;
-            a.velocity.y = randomNum/3-0.166; //close to horizontal
             model.asteroids.push(a);
             model.lastAsteroidCreation = time
         }
 
         //Check asteroids for hits
-        model.asteroids.forEach(function(a) {
+        model.asteroids.forEach( function(a) {
             model.laserBeams.forEach( function (beam) {
-                if (a.isHitBy(beam)) {
-                    a.remove = true;  //mark for removal
+                var check = a.isHitBy(beam);
+                if (check && check.yes) {
                     beam.remove = true
-                    if (a.radius>20){ //make 2 slower children with
-                                      //different vertical angle
-                        var v = a.velocity;
-                        var p = a.position;
-                        for (var i = -1; i < 2; i += 2 ){
-                            //one child goes up one down
-                            var child = new Asteroid(p.x, p.y+i*20, a.radius/2, a.type);
-                            child.velocity = new Vector(v.x/2, i*randomNum/2, 0);
-                            model.asteroids.push(child);
-                        }
-                    }
+                    check.children.forEach(function (c){
+                        model.asteroids.push(c);
+                    })
                 }
             });
         });
@@ -203,8 +175,6 @@ function controller(progress) {
             a.rotation +=  a.spin;
         });
     }
-
-
 
     function CleanOutOfFrame() {
         model.laserBeams = model.laserBeams.filter(isInFrame);
@@ -220,11 +190,8 @@ function controller(progress) {
 }
 
 
-
-
 //////////////// World Events ///////////////////
 /////////////////////////////////////////////////
-
 model.makeStars();
 function loop(timestamp) {
     var progress = timestamp - lastRender
@@ -256,83 +223,3 @@ function keyup(event) {
     mKeys[key] = false;
     mKeys.lastKey = "";
 }
-
- /*  EXPLOSION   // shim layer with setTimeout fallback
-window.requestAnimFrame = (function(){
-    return  window.requestAnimationFrame       ||
-            window.webkitRequestAnimationFrame ||
-            window.mozRequestAnimationFrame    ||
-            window.oRequestAnimationFrame      ||
-            window.msRequestAnimationFrame     ||
-            function( callback ){
-              window.setTimeout(callback, 1000 / 60);
-            };
-  })();
-
-  var canvas = document.getElementById("canvas"),
-      ctx = canvas.getContext("2d"),
-      W = window.innerWidth,
-      H = window.innerHeight,
-      circles = [];
-
-  canvas.width = W;
-  canvas.height = H;
-
-  //Random Circles creator
-  function create() {
-
-      //Place the circles at the center
-
-      this.x = W/2;
-      this.y = H/2;
-
-
-      //Random radius between 2 and 6
-      this.radius = 2 + Math.random()*2;
-
-      //Random velocities
-      this.vx = -5 + Math.random()*10;
-      this.vy = -5 + Math.random()*10;
-
-      //Random colors
-      this.r = 100+Math.round(Math.random())*140;
-      this.g = 60;
-      this.b = 10;
-  }
-
-  for (var i = 0; i < 100; i++) {
-      circles.push(new create());
-  }
-
-  function draw() {
-
-      //Fill canvas with black color
-      ctx.globalCompositeOperation = "source-over";
-      ctx.fillStyle = "rgba(0,0,0,0.15)";
-      ctx.fillRect(0, 0, W, H);
-
-      //Fill the canvas with circles
-      for(var j = 0; j < circles.length; j++){
-          var c = circles[j];
-
-          //Create the circles
-          ctx.beginPath();
-          ctx.arc(c.x, c.y, c.radius, 0, Math.PI*2, false);
-          ctx.fillStyle = "rgba("+c.r+", "+c.g+", "+c.b+", 0.5)";
-          ctx.fill();
-
-          c.x += c.vx;
-          c.y += c.vy;
-          c.radius -= .02;
-
-          if(c.radius < 0)
-              circles[j] = new create();
-      }
-  }
-
-  function animate() {
-      requestAnimFrame(animate);
-      draw();
-  }
-
- */
