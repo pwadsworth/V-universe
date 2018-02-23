@@ -39,4 +39,8 @@ function Utils() {
         }
         return str;
     }
+
+    this.map= function (param, in_min, in_max, out_min, out_max) {
+        return (param - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    }
 }

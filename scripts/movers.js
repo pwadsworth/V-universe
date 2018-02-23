@@ -156,17 +156,17 @@ function Asteroid( _x, _y, _r, _type) {
     var outline, fill, life,
         radius = _r || Math.random() * 40 + 15,
         mass = radius / 3,
-        x = _x || width + 50,               //initial position
+        x = _x || width + 50,                //initial position
         y = _y || Math.random() * height,
-        n = Math.random() * 15 + 4,          //4 to 15 vertices
+        n = Math.random() * 15 + 5,          //5 to 15 vertices
         shape = function () {
             var poly = [];
             for (var i = 1; i <= n; i++) {
-                var o = Math.random();//vertices' offset
-                if (o<0.4) o = 0.4;   //limited to 40% radius
-                var r = radius * o;
-                var Xi = r*Math.cos(i*2*Math.PI/n);
-                var Yi = r*Math.sin(i*2*Math.PI/n);
+                var o = Math.random()*30-15; //offset r +/-15
+                var r = radius + o;
+                var angle = utils.map(i, 0, n, 0, 2*Math.PI)
+                var Xi = r*Math.cos(angle);
+                var Yi = r*Math.sin(angle);
                 poly.push([Xi, Yi])
             }
             return poly;

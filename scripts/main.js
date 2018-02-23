@@ -1,8 +1,3 @@
-//TODO:
-//  -ship.fire with negative energy and throws error.
-//  -Add other weapon types to ship.js
-//  -Slow laser creation
-
 // User Settings
 var astrdMaxSpeed = 1,  //Asteroids max speed factor (x200 m/s)
     AsteroidsF = 2,     //Seconds between new asteroid creation
@@ -21,7 +16,6 @@ var astrdMaxSpeed = 1,  //Asteroids max speed factor (x200 m/s)
         76: 'thrusterRight',  //L
         75: 'thrusterBack'    //K
     };
-
 
 //GLOBAL SETUP
 var DEBUG = false,         //Debug mode toggle

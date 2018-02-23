@@ -1,7 +1,7 @@
 # V-universe
 Asteroids redux loosly based in Voltron universe, for Sammy.
 
-[Open](/main.html)
+[Open](https://pwadsworth.github.io/V-universe/main.html)
 
 ## TO DO:
 - Add HUD to space transition
