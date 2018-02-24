@@ -1,6 +1,23 @@
 var width = window.innerWidth - 25;
 var height = window.innerHeight - 25;
 
+function Particle(vx,vy, px,py, fill){
+    this.velocity = new Vector (vx, vy);
+    this.position = new Vector (px, py);
+    this.fillColor = fill || 'white';
+    this.update = function(){
+        this.position.add(this.velocity)
+    }
+    this.renderIn = function(ctx){
+        ctx.save();
+        ctx.translate(this.position.x, this.position.y);
+        ctx.fillStyle = this.fillColor;
+        ctx.fillRect(this.position.x, this.position.y, 2,2)
+        ctx.restore();
+    }
+}
+
+
 //////////////////////////////////////////////
 //Basic moving object class. No edge detection.
 function Mover(x, y, shape, mass, life, outline, fill, rotation, spin, radius) {

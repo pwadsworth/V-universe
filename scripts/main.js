@@ -44,6 +44,8 @@ var model = {
 
     asteroids: [],
 
+    explosions: [],
+
     lastAsteroidCreation: 0,
 
     stars: [],
@@ -56,15 +58,10 @@ var model = {
         }
     },
 
-    cleanUp: function(){//remove asteroids and lasers flagged
-        model.asteroids = model.asteroids.filter(function(x){
-            return !x.remove});
-        model.laserBeams = model.laserBeams.filter(function(x){
-            return !x.remove});
-        model.enemies = model.enemies.filter(function(x){
-            return !x.remove});
-        }
-}
+    cleanUp: function(arr){
+         model[arr] = model[arr].filter(function(x){ return !x.remove});
+    }
+};
 
 /////////////VIEW/////////////
 function view() {
@@ -79,12 +76,13 @@ function view() {
     ctx.save();
 
     //Draw game elements
-  
     model.asteroids.forEach(function (a) {a.renderIn(ctx)})
     model.enemies.forEach(function (e)  {e.renderIn(ctx)})
     drawBeams();
     model.ship.renderIn(ctx);
     drawHUD();
+
+    
 
     function drawBeams() {
         var beams = model.laserBeams;
@@ -110,7 +108,7 @@ function view() {
     }
 }
 
-////////////////TEST
+function testEnemies(){
   model.enemies.push(new EnemyFighter(width, 50))
   model.enemies.push(new EnemyCorvette(width, 100, 0, 0))
   model.enemies.push(new EnemyFighter(width, 150))
@@ -118,11 +116,15 @@ function view() {
   model.enemies.forEach(function(e) {
       e.acceleration = theForce;  
   })
+}
+
 /////////////CONTROLER/////////////
 function controller(progress) {
     var p = progress / 16
     var s = model.ship
 
+    if (model.enemies.length == 0) testEnemies();  //TEST
+    
     model.ship.update(p);
     updateBeams();
     updateAsteroids()
@@ -141,8 +143,10 @@ function controller(progress) {
                 if (check) beam.remove = true
             });
             e.update();
-        });
-        model.cleanUp();
+        if (e.isDead) {
+                // ADD EXPLOSION
+        } });
+        model.cleanUp('enemies');
     }
 
     function updateBeams(p) {
@@ -151,6 +155,7 @@ function controller(progress) {
                 beam.position = beam.position.add(beam.velocity);
             }
         })
+        model.cleanUp('laserBeams');
     }
 
     function updateAsteroids() {
@@ -178,7 +183,7 @@ function controller(progress) {
                 }
             });
         });
-        model.cleanUp();
+        model.cleanUp('asteroids');
 
         model.asteroids.forEach(function (a) {
             a.position = a.position.add(a.velocity)
