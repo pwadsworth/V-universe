@@ -18,7 +18,7 @@ var astrdMaxSpeed = 1,  //Asteroids max speed factor (x200 m/s)
     };
 
 //GLOBAL SETUP
-var DEBUG = true,         //Debug mode toggle
+var DEBUG = false,         //Debug mode toggle
     utils = new Utils(),
     canvas = document.getElementById('myCanvas'),
     width = window.innerWidth - 25,
@@ -61,7 +61,9 @@ var model = {
             return !x.remove});
         model.laserBeams = model.laserBeams.filter(function(x){
             return !x.remove});
-    }
+        model.enemies = model.enemies.filter(function(x){
+            return !x.remove});
+        }
 }
 
 /////////////VIEW/////////////
@@ -77,10 +79,11 @@ function view() {
     ctx.save();
 
     //Draw game elements
-    model.ship.renderIn(ctx);
+  
     model.asteroids.forEach(function (a) {a.renderIn(ctx)})
     model.enemies.forEach(function (e)  {e.renderIn(ctx)})
     drawBeams();
+    model.ship.renderIn(ctx);
     drawHUD();
 
     function drawBeams() {
@@ -108,12 +111,13 @@ function view() {
 }
 
 ////////////////TEST
-for (var i = 0; i<5; i++){         
-  model.enemies.push(new EnemyCorvette(10*i, 50*(i+1), 180))
-  var theForce = new Vector(2, 0);  
-  model.enemies[i].acceleration = theForce;  
-}
-
+  model.enemies.push(new EnemyFighter(width, 50))
+  model.enemies.push(new EnemyCorvette(width, 100, 0, 0))
+  model.enemies.push(new EnemyFighter(width, 150))
+  var theForce = new Vector(-2, 0);  
+  model.enemies.forEach(function(e) {
+      e.acceleration = theForce;  
+  })
 /////////////CONTROLER/////////////
 function controller(progress) {
     var p = progress / 16
@@ -130,9 +134,15 @@ function controller(progress) {
     CleanOutOfFrame();
 
     function updateEnemies() {
-        for (var i = 0; i<model.enemies.length; i++){      
-            model.enemies[i].update();       
-        }
+        //Check enemies for hits
+        model.enemies.forEach( function(e) {
+            model.laserBeams.forEach( function (beam) {
+                var check = e.isHitBy(beam);
+                if (check) beam.remove = true
+            });
+            e.update();
+        });
+        model.cleanUp();
     }
 
     function updateBeams(p) {
@@ -156,7 +166,7 @@ function controller(progress) {
             model.lastAsteroidCreation = time
         }
 
-        //Check asteroids for hits
+        //Check asteroids for hit and collisions
         model.asteroids.forEach( function(a) {
             model.laserBeams.forEach( function (beam) {
                 var check = a.isHitBy(beam);

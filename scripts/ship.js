@@ -4,14 +4,14 @@ function PlayerShip(x, y, enginePwr, maxSpeed) {
     var playerShape = [[0, 5], [10, 15], [10, 0], [10, 15], [0, -15],
                        [-10, 15], [-10, 0], [-10, 15], [0, 5]];
     var mass = 10,
-        life = 10,
+        life = 20,
         outline = '#889',
         fill = '#eee',
         rotation = 90,
         spin = 0,
         radius = 25;
     FlyThrough.call(this, x, y, playerShape, mass, life, outline, fill, rotation, spin, radius);
-
+    this.wpnType = 'basic';
     this.enginePwr = enginePwr || 1;
     this.maxSpeed = maxSpeed || 60;
     this.pwr = 1000;
@@ -149,6 +149,7 @@ PlayerShip.prototype.fire = function () {
     if ((this.pwr > 5) && (dT > this.fireRate) ) {
         this.lastLaser = Date.now()
         this.pwr -= 5;
+        var beam
         switch (this.wpnType){
             case 'double':{
                 //TODO
@@ -158,11 +159,12 @@ PlayerShip.prototype.fire = function () {
                 //TODO
                 break;
             }
-            default:
+            case 'basic':
                 var x = 10 * Math.cos(utils.toRadian(this.rotation-90));
                 var y = 15 * Math.sin(utils.toRadian(this.rotation-90));
-                var beam = {
+                beam = {
                     remove: false,
+                    force: function () {return 2},
                     position: this.position,
                     velocity: this.velocity.add(new Vector(x,y,0)),
                 }

@@ -15,6 +15,7 @@ function Mover(x, y, shape, mass, life, outline, fill, rotation, spin, radius) {
     this.position = new Vector(x, y);
     this.velocity = new Vector(0, 0);
     this.acceleration = new Vector(0, 0);
+    this.remove = false;
 }
 Mover.prototype = {
     applyForce: function (force) {
@@ -55,8 +56,25 @@ Mover.prototype = {
         }
 
     },
-    isDead: function () { return this.life < 1 }
-}
+
+    isHitBy: function (other){
+        if ((other.position.x < this.position.x+this.radius)
+            && (other.position.x > this.position.x-this.radius)
+            && (other.position.y < this.position.y+this.radius)
+            && (other.position.y > this.position.y-this.radius)) {
+                this.life -= other.force();
+                this.isDead(); 
+                return true
+            } else return false;
+    },
+
+    isDead: function () {    //check life and flag if dead
+        if (this.life < 1) {
+            this.remove = true;
+            return true
+        } else return false
+    }
+}   
 var moverUpdate = Mover.prototype.update; // Globals for method extension
 var moverRender = Mover.prototype.renderIn;
 
@@ -65,7 +83,7 @@ var moverRender = Mover.prototype.renderIn;
 //Loses %dampenF (0-1) velocity each bounce
 function Bouncer(x, y, shape, mass, life, outline, fill, rotation, spin, dampenF, radius) {
     Mover.call(this, x, y, shape, mass, life, outline, fill, rotation, spin, radius);
-    this.dampenF = dampenF || 0.05;
+    this.dampenF = dampenF || 0;
 }
 Bouncer.prototype = Object.create(Mover.prototype);
 Bouncer.prototype.constructor = Bouncer;
@@ -122,9 +140,9 @@ FlyThrough.prototype.checkEdges = function () {
 
 ///////////////////////
 /////Basic enemy fighter
-function EnemyFighter(x, y, rotation) {
-    var life = 2, mass = 1, shape = null, outline = '#900', fill = '#900', spin = 0, dampingF = 0.01, radius = 7;
-    Bouncer.call(this, x, y, shape, mass, life, outline, fill, rotation, spin, dampingF, radius)
+function EnemyFighter(x, y, rotation, dampenF) {
+    var life = 2, mass = 1, shape = null, outline = '#900', fill = '#900', spin = 0, radius = 7;
+    Bouncer.call(this, x, y, shape, mass, life, outline, fill, rotation, spin, dampenF, radius)
 }
 EnemyFighter.prototype = Object.create(Bouncer.prototype);
 EnemyFighter.prototype.constructor = EnemyFighter;
@@ -132,7 +150,7 @@ EnemyFighter.prototype.constructor = EnemyFighter;
 ///////////////////
 /////Enemy Corvette
 function EnemyCorvette(x, y, rotation, dampenF) {
-    var mass = 10, life = 20, fill = '#505', outline = '#717', spin = 0, radius = 35;
+    var mass = 10, life = 10, fill = '#505', outline = '#717', spin = 0, radius = 35;
     var shape = [
         [-25, 0], [0, 4], [7, 4], [20, 20], [15, 4],     //right side
         [15, -4], [20, -20], [7, -4], [0, -4], [-25, 0], //left side

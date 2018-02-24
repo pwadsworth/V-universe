@@ -55,13 +55,13 @@ function Asteroid( _x, _y, _r, _type) {
 Asteroid.prototype = Object.create(Mover.prototype);
 Asteroid.prototype.constructor = Asteroid;
 
-Asteroid.prototype.isHitBy = function (point){
+Asteroid.prototype.isHitBy = function (other){
     var result = {yes: false, children: []}
-    if ((point.position.x < this.position.x+this.radius)
-        && (point.position.x > this.position.x-this.radius)
-        && (point.position.y < this.position.y+this.radius)
-        && (point.position.y > this.position.y-this.radius)) {
-        this.life -= 3;
+    if ((other.position.x < this.position.x+this.radius)
+        && (other.position.x > this.position.x-this.radius)
+        && (other.position.y < this.position.y+this.radius)
+        && (other.position.y > this.position.y-this.radius)) {
+        this.life -= other.force();
         if (this.life <5) {
             this.remove = true;  //mark for removal
             if (this.radius>20){ 
