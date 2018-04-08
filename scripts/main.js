@@ -1,5 +1,5 @@
 // User Settings
-var astrdMaxSpeed = 1,  //Asteroids max speed factor (x200 m/s)
+var astrdMaxSpeed = 1,  //Asteroids max speed factor (x200 km/s)
     AsteroidsF = 2,     //Seconds between new asteroid creation
     maxSpeed = 60,      //Ship max speed (x1000 km/s) i.e  500=c
     enginePwr = 1,      //Main engine power.
@@ -18,7 +18,7 @@ var astrdMaxSpeed = 1,  //Asteroids max speed factor (x200 m/s)
     };
 
 //GLOBAL SETUP
-var DEBUG = false,         //Debug mode toggle
+var DEBUG = true,         //Debug mode toggle
     utils = new Utils(),
     canvas = document.getElementById('myCanvas'),
     width = window.innerWidth - 25,
@@ -44,14 +44,16 @@ var model = {
 
     asteroids: [],
 
-    explosions: [],
+    particles: [],
 
     lastAsteroidCreation: 0,
 
     stars: [],
 
     makeStars: function () {
-        for (var i = 0; i <= width / 2; i++) {
+
+        for (var i = 0; i <= width; i++) {
+          //  model.stars[i] = new Star();
             var x = Math.floor(Math.random() * width)
             var y = Math.floor(Math.random() * height)
             model.stars.push({ x: x, y: y })
@@ -69,6 +71,13 @@ function view() {
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = 'rgb(0,0,0)';
     ctx.fillRect(0, 0, width, height);
+
+   // speed = 0  //map(mouseX, 0, width, 0, 100);
+ //   ctx.translate(width / 2, height / 2);
+    // for (var i = 0; i < model.stars.length; i++) {
+    //     model.stars[i].update();
+  //    model.stars[i].show(ctx);
+// }
     ctx.fillStyle = 'rgb(255,255,255)';
     model.stars.forEach(function (s) {
         ctx.fillRect(s.x, s.y, 2, 2)
@@ -78,6 +87,7 @@ function view() {
     //Draw game elements
     model.asteroids.forEach(function (a) {a.renderIn(ctx)})
     model.enemies.forEach(function (e)  {e.renderIn(ctx)})
+    model.particles.forEach(function (p) {p.renderIn(ctx)})
     drawBeams();
     model.ship.renderIn(ctx);
     drawHUD();
@@ -88,7 +98,7 @@ function view() {
         var beams = model.laserBeams;
         ctx.fillStyle = "red";
         beams.forEach(function (b) {
-            ctx.fillRect(b.position.x, b.position.y, 4, 4)
+            ctx.fillRect(b.position.x, b.position.y, 3, 3)
         });
        ctx.restore();
     }
@@ -124,12 +134,16 @@ function controller(progress) {
     var s = model.ship
 
     if (model.enemies.length == 0) testEnemies();  //TEST
-    
+
     model.ship.update(p);
     updateBeams();
     updateAsteroids()
     updateEnemies();
-    if (s.pressedKeys.fireWpn && s.pwr > 50) {
+    model.particles.forEach(function (p){
+        p.position = p.position.add(p.velocity)
+    });
+
+    if (s.pressedKeys.fireWpn) {
         var b = s.fire();
         if (b) model.laserBeams.push(b);
     }
@@ -139,17 +153,14 @@ function controller(progress) {
         //Check enemies for hits
         model.enemies.forEach( function(e) {
             model.laserBeams.forEach( function (beam) {
-                var check = e.isHitBy(beam);
-                if (check) beam.remove = true
+                if (e.isHitBy(beam)) beam.remove = true
             });
             e.update();
-        if (e.isDead) {
-                // ADD EXPLOSION
-        } });
+        });
         model.cleanUp('enemies');
     }
 
-    function updateBeams(p) {
+    function updateBeams() {
         model.laserBeams.forEach(function (beam) {
             if (beam) {
                 beam.position = beam.position.add(beam.velocity);
@@ -171,12 +182,11 @@ function controller(progress) {
             model.lastAsteroidCreation = time
         }
 
-        //Check asteroids for hit and collisions
+        //Check asteroids for hits
         model.asteroids.forEach( function(a) {
             model.laserBeams.forEach( function (beam) {
                 var check = a.isHitBy(beam);
                 if (check && check.yes) {
-                    beam.remove = true
                     check.children.forEach(function (c){
                         model.asteroids.push(c);
                     })
@@ -194,6 +204,7 @@ function controller(progress) {
     function CleanOutOfFrame() {
         model.laserBeams = model.laserBeams.filter(isInFrame);
         model.asteroids = model.asteroids.filter(isInFrame);
+        model.particles = model.particles.filter(isInFrame);
         function isInFrame(el) {
             if (el){
                 if (el.position.x > width + 100 || el.position.y > height + 100) return false;

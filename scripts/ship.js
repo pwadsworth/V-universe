@@ -84,6 +84,7 @@ PlayerShip.prototype.renderIn = function (ctx) {
     }
     ctx.restore();
 };
+
 PlayerShip.prototype.update = function (p) {
     //Method extension called at end, after setup.
     //update PWR
@@ -138,7 +139,7 @@ PlayerShip.prototype.update = function (p) {
     }
     // Limit max speed   **Global setting
     if (this.velocity.length() > this.maxSpeed) {
-        this.velocity = this.velocity.limit(this.maxSpeed)
+        this.velocity.limit(this.maxSpeed)
     }
     moverUpdate.call(this)
     this.checkEdges();
@@ -146,10 +147,15 @@ PlayerShip.prototype.update = function (p) {
 
 PlayerShip.prototype.fire = function () {
     var dT =  Date.now()- this.lastLaser;
+    var beam = {    //Dummy beam to return if there is no power
+                remove: true, 
+                force: function () {return 0},
+                position: new Vector (0,0,0),
+                velocity: this.velocity.add(new Vector(-10,0,0))
+            };
     if ((this.pwr > 5) && (dT > this.fireRate) ) {
         this.lastLaser = Date.now()
         this.pwr -= 5;
-        var beam
         switch (this.wpnType){
             case 'double':{
                 //TODO
@@ -166,7 +172,7 @@ PlayerShip.prototype.fire = function () {
                     remove: false,
                     force: function () {return 2},
                     position: this.position,
-                    velocity: this.velocity.add(new Vector(x,y,0)),
+                    velocity: this.velocity.add(new Vector(x,y,0))
                 }
                 break;
         }

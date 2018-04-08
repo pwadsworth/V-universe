@@ -1,18 +1,17 @@
 var width = window.innerWidth - 25;
 var height = window.innerHeight - 25;
 
-function Particle(vx,vy, px,py, fill){
+function Particle(vx, vy, px, py, fill){
     this.velocity = new Vector (vx, vy);
     this.position = new Vector (px, py);
     this.fillColor = fill || 'white';
     this.update = function(){
-        this.position.add(this.velocity)
+        this.position.add(this.velocity);
     }
     this.renderIn = function(ctx){
         ctx.save();
-        ctx.translate(this.position.x, this.position.y);
         ctx.fillStyle = this.fillColor;
-        ctx.fillRect(this.position.x, this.position.y, 2,2)
+        ctx.fillRect(this.position.x, this.position.y, 3 ,3)
         ctx.restore();
     }
 }
@@ -88,9 +87,23 @@ Mover.prototype = {
     isDead: function () {    //check life and flag if dead
         if (this.life < 1) {
             this.remove = true;
-            return true
+            this.explode();
+            return true;
         } else return false
+    },
+
+    explode: function () {   //make particle explosion
+        numParticles = this.mass * 10;
+        for (var i = 0; i <= numParticles; i++){
+            var vx = Math.random()*6+1;
+            var vy = Math.random()*6+1;
+            if (Math.random()>0.5) vx *= -1;
+            if (Math.random()>0.5) vy *= -1;
+            var p = new Particle(vx, vy, this.position.x, this.position.y, this.fillColor);
+            model.particles.push(p)
+        }
     }
+
 }   
 var moverUpdate = Mover.prototype.update; // Globals for method extension
 var moverRender = Mover.prototype.renderIn;

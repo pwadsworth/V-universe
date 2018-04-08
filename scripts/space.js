@@ -3,67 +3,45 @@
 //     based on Daniel Shiffman's P5 tutorials
 //
 
-
-var stars = [];
-var speed;
-
-function setup() {
-  createCanvas( window.innerWidth-10 , window.innerHeight-10 );
-  for (var i = 0; i < 1500; i++) {
-    stars[i] = new Star();
-  }
-}
-
-function draw() {
-  speed = map(mouseX, 0, width, 0, 100);
-  background(0);
-  translate(width / 2, height / 2);
-  for (var i = 0; i < stars.length; i++) {
-    stars[i].update();
-    stars[i].show();
-  }
-}
+var speed = 10;
+var width = window.innerWidth - 25;
+var height = window.innerHeight - 25;
 
 function Star() {
-  this.x = random(-width, width);
-  this.y = random(-height, height);
-  this.z = random(width);
+  this.x = Math.random()*width;
+  this.y = Math.random()*height;
+  this.z = Math.random()*width;
   this.pz = this.z;
-  this.color = random(['orange','gold','blue','white', 'white', 'white','white', 'white', 'white'])
+  this.color = utils.random(['orange','gold','blue','white', 'white', 'white','white', 'white', 'white'])
 
   this.update = function() {
     this.z = this.z - speed;
     if (this.z < 1) {
       this.z = width;
-      this.x = random(-width, width);
-      this.y = random(-height, height);
+      this.x = Math.random()*width;
+      this.y = Math.random()*height;
       this.pz = this.z;
     }
   }
 
   this.show = function(ctx) {
-    fill(this.color);
-    noStroke();
+    ctx.fillStyle = this.color;
 
-    var sx = map(this.x / this.z, 0, 1, 0, width);
-    var sy = map(this.y / this.z, 0, 1, 0, height);
+    var sx = utils.map(this.x / this.z, 0, 1, 0, width);
+    var sy = utils.map(this.y / this.z, 0, 1, 0, height);
 
-    var r = map(this.z, 0, width, 5, 0);
-    ellipse(sx, sy, r, r);
+    var r = utils.map(this.z, 0, width, 5, 0);
+    ctx.fillRect(sx, sy, r, r);
 
-    var px = map(this.x / this.pz, 0, 1, 0, width);
-    var py = map(this.y / this.pz, 0, 1, 0, height);
+    var px = utils.map(this.x / this.pz, 0, 1, 0, width);
+    var py = utils.map(this.y / this.pz, 0, 1, 0, height);
 
     this.pz = this.z;
 
-    stroke(this.color);
-    line(px, py, sx, sy);
+    ctx.strokeStyle = this.color;
+    ctx.moveTo(sx, sy);
+    ctx.lineTo(px, py);
 
   }
 }
 
-function StarField(ctx){
-  for (var i = 0; i < 1500; i++) {
-    stars[i] = new Star();
-  }
-}

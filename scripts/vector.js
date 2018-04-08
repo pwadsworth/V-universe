@@ -70,13 +70,20 @@ Vector.prototype = {
   init: function(x, y, z) {
     this.x = x; this.y = y; this.z = z;
     return this;
+  },
+  limit: function (maxLength){
+    var lenSqr = this.dot(this);
+    var maxLenSqr = maxLength*maxLength;
+    if ((lenSqr>maxLenSqr) && (lenSqr >0)) {
+      var ratio = maxLength/Math.sqrt(lenSqr)
+      this.x *= ratio;
+      this.y *= ratio;
+      this.z *= ratio;
+    }
   }
 };
 
 // Static Methods
-// Vector.randomDirection() returns a vector with a length of 1 and a statistically uniform direction. 
-// Vector.lerp() performs linear interpolation between two vectors.
-
 Vector.negative = function(a, b) {
   b.x = -a.x; b.y = -a.y; b.z = -a.z;
   return b;
@@ -117,7 +124,9 @@ Vector.unit = function(a, b) {
 Vector.fromAngles = function(theta, phi) {
   return new Vector(Math.cos(theta) * Math.cos(phi), Math.sin(phi), Math.sin(theta) * Math.cos(phi));
 };
+
 Vector.randomDirection = function() {
+// Returns a vector with a length of 1 and a statistically uniform direction.
   return Vector.fromAngles(Math.random() * Math.PI * 2, Math.asin(Math.random() * 2 - 1));
 };
 Vector.min = function(a, b) {
@@ -127,6 +136,7 @@ Vector.max = function(a, b) {
   return new Vector(Math.max(a.x, b.x), Math.max(a.y, b.y), Math.max(a.z, b.z));
 };
 Vector.lerp = function(a, b, fraction) {
+// Performs linear interpolation between two vectors.
   return b.subtract(a).multiply(fraction).add(a);
 };
 Vector.fromArray = function(a) {

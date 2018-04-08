@@ -36,14 +36,19 @@ function Asteroid( _x, _y, _r, _type) {
             this.type = "silicate";     
             mass *= 2;
         }
-        else  if  (provRoll >= 0.92){//Metallic asteroids are reddish in color, make 13% of known asteroids. Mostly made of nickle-iron.
+        else  if  (provRoll < 0.99){//Metallic asteroids are reddish in color, make 13% of known asteroids. Mostly made of nickle-iron.
             this.type = 'metallic';
             mass *= 3;              //higher density
+        }
+        else if (provRoll >= 0.99) { //Pure diamond asteroid at Sammy's request 
+            this.type = 'diamond'; 
+            mass *= 1000;
         }
     }
     if (this.type === 'clay') outline = '#222';
     else if (this.type === 'silicate') outline = '#010';
     else if (this.type === 'metallic') outline = '#100';
+    else if (this.type === 'diamond') outline = '#fff';
 
     var fill = outline;
     var life = mass;
@@ -62,7 +67,7 @@ Asteroid.prototype.isHitBy = function (other){
         && (other.position.y < this.position.y+this.radius)
         && (other.position.y > this.position.y-this.radius)) {
         this.life -= other.force();
-        if (this.life <5) {
+        if (this.isDead()) {
             this.remove = true;  //mark for removal
             if (this.radius>20){ 
                 //make 2 slower asteroids with different direction
