@@ -2,7 +2,7 @@
 var astrdMaxSpeed = 1,  //Asteroids max speed factor (x200 km/s)
     AsteroidsF = 2,     //Seconds between new asteroid creation
     maxSpeed = 60,      //Ship max speed (x1000 km/s) i.e  500=c
-    enginePwr = 1,      //Main engine power.
+    enginePwr = 0.5,      //Main engine power.
                         //Thrusters = 1/10 enginePwr
     font = '18px Arial',
     fontColor = 'rgb(0,255,0)',
@@ -130,29 +130,30 @@ function testEnemies(){
 function controller(progress) {
     var p = progress / 16
     var s = model.ship
+    if (s.remove) {
+        model.ship = new PlayerShip(width/5, height/2, enginePwr, maxSpeed)
+    }
 
     if (model.enemies.length == 0) testEnemies();  //TEST
-
-    model.ship.update(p);
+    s.update(p);
     updateBeams();
     updateAsteroids()
     updateEnemies();
     model.particles.forEach(function (p){
         p.position = p.position.add(p.velocity)
     });
-
     if (s.pressedKeys.fireWpn) {
-        var b = s.fire();
-        if (b) model.laserBeams.push(b);
+        var beam = s.fire();
+        if (beam) model.laserBeams.push(beam);
     }
     CleanOutOfFrame();
 
     function updateEnemies() {
-        //Check enemies for hits
-        model.enemies.forEach( function(e) {
-            model.laserBeams.forEach( function (beam) {
-                if (e.isHitBy(beam)) beam.remove = true
+        //Check enemies for collisions
+        model.enemies.forEach(function(e) {
+            model.laserBeams.forEach(function (beam) {e.isHitBy(beam)
             });
+            e.isHitBy(model.ship)
             e.update();
         });
         model.cleanUp('enemies');

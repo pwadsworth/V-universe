@@ -141,6 +141,7 @@ PlayerShip.prototype.update = function (p) {
     if (this.velocity.length() > this.maxSpeed) {
         this.velocity.limit(this.maxSpeed)
     }
+    //Global hook to add parent class methods
     moverUpdate.call(this)
     this.checkEdges();
 }
@@ -158,14 +159,14 @@ PlayerShip.prototype.fire = function () {
             break;
         }
         case 'basic':
-            if ((this.pwr > 50) && (dT > this.fireRate) ) {
+            if ((this.pwr > 30) && (dT > this.fireRate) ) {
                 this.lastLaser = Date.now()
-                this.pwr -= 50;
+                this.pwr -= 30;
                 var x = 10*Math.cos(utils.toRadian(this.rotation-90));
                 var y = 15*Math.sin(utils.toRadian(this.rotation-90));
                 beam.velocity = this.velocity.add(new Vector(x,y,0));
                 beam.remove = false;
-                beam.force = function () {return 1};
+                beam.force = function () {return 2};
                 beam.position = this.position;
             }
             break;

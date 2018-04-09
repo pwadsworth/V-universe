@@ -67,6 +67,7 @@ Asteroid.prototype.isHitBy = function (other){
         && (other.position.y < this.position.y+this.radius)
         && (other.position.y > this.position.y-this.radius)) {
         this.life -= other.force();
+        other.remove = true;
         if (this.isDead()) {
             this.remove = true;  //mark for removal
             if (this.radius>20){ 

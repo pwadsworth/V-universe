@@ -83,9 +83,7 @@ Mover.prototype = {
             ctx.closePath();
             ctx.stroke();
         }
-
     },
-
     isHitBy: function (other){
         if ((other.position.x < this.position.x+this.radius)
             && (other.position.x > this.position.x-this.radius)
@@ -102,7 +100,6 @@ Mover.prototype = {
                 return true
             } else return false;
     },
-
     isDead: function () {    //check life and flag if dead
         if (this.life < 1) {
             this.remove = true;
@@ -110,22 +107,23 @@ Mover.prototype = {
             return true;
         } else return false
     },
-
     explode: function () {   //make particle explosion
         numParticles = this.mass * 3;
         for (var i = 0; i <= numParticles; i++){
             var vx = Math.random()*6+1;
             var vy = Math.random()*6+1;
-            if (Math.random()>0.5) vx *= -1;
-            if (Math.random()>0.5) vy *= -1;
+            if (Math.random()>=0.5) vx *= -1;
+            if (Math.random()>=0.5) vy *= -1;
             var p = new Particle(vx, vy, this.position.x, this.position.y, '#f50');
             model.particles.push(p)
         }
     }
+}
 
-}   
-var moverUpdate = Mover.prototype.update; // Globals for method extension
+// Globals hooks for method extension
+var moverUpdate = Mover.prototype.update; 
 var moverRender = Mover.prototype.renderIn;
+// var moverIsHitBy = Mover.prototype.isHitBy;
 
 ///////////////////////////////////////////////
 //Bouncer class: A mover that bounces off edges.
@@ -190,7 +188,7 @@ FlyThrough.prototype.checkEdges = function () {
 ///////////////////////
 /////Basic enemy fighter
 function EnemyFighter(x, y, rotation, dampenF) {
-    var life = 2, mass = 1, shape = null, outline = '#900', fill = '#900', spin = 0, radius = 7;
+    var life = 2, mass = 5, shape = null, outline = '#900', fill = '#900', spin = 0, radius = 7;
     Bouncer.call(this, x, y, shape, mass, life, outline, fill, rotation, spin, dampenF, radius)
 }
 EnemyFighter.prototype = Object.create(Bouncer.prototype);
