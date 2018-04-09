@@ -14,5 +14,11 @@ Asteroids redux loosly based in Voltron universe, for Sammy.
 - ~Model life points for asteroids~
 - Add wpn to enemy ships
 - Remove velocity effects on lasers
+<<<<<<< HEAD
 - ~Add explosions~
 - Add collision detection
+||||||| merged common ancestors
+- Add explosions
+=======
+- ~Add explosions~
+>>>>>>> 469f736695a5c19b6d0798bec63509b83fa28136
