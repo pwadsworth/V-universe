@@ -1,6 +1,17 @@
 var width = window.innerWidth - 25;
 var height = window.innerHeight - 25;
 
+////////////////////////////////////////
+//Laser beam class with dummy start up values
+function Beam (rem, f, pos, v){  
+    this.remove = rem || true;  
+    this.force = f || function () {return 0};
+    this.position = pos || new Vector (0,0,0);
+    this.velocity = v || new Vector(-10,0,0);
+};
+
+////////////////////////////////////////
+//Particle class. For explosions.
 function Particle(vx, vy, px, py, fill){
     this.velocity = new Vector (vx, vy);
     this.position = new Vector (px, py);
@@ -16,12 +27,14 @@ function Particle(vx, vy, px, py, fill){
     }
 }
 
-
 //////////////////////////////////////////////
 //Basic moving object class. No edge detection.
 function Mover(x, y, shape, mass, life, outline, fill, rotation, spin, radius) {
     this.shape = shape || [[3, -3], [3, 3], [-3, 0], [3, -3]];
     this.mass = mass || 1;
+    this.force = function () {
+        return this.mass * this.velocity.length();
+    }
     this.radius = radius || console.log('Bounding radius value is required for calling ' + this.constructor.toString());
     this.rotation = rotation || 0;
     this.spin = spin || 0;
@@ -79,7 +92,13 @@ Mover.prototype = {
             && (other.position.y < this.position.y+this.radius)
             && (other.position.y > this.position.y-this.radius)) {
                 this.life -= other.force();
-                this.isDead(); 
+                this.isDead();
+                if (other instanceof Beam){
+                    other.remove = true;
+                    return true
+                }
+                other.life -= this.force();
+                other.isDead();
                 return true
             } else return false;
     },
@@ -93,13 +112,13 @@ Mover.prototype = {
     },
 
     explode: function () {   //make particle explosion
-        numParticles = this.mass * 10;
+        numParticles = this.mass * 3;
         for (var i = 0; i <= numParticles; i++){
             var vx = Math.random()*6+1;
             var vy = Math.random()*6+1;
             if (Math.random()>0.5) vx *= -1;
             if (Math.random()>0.5) vy *= -1;
-            var p = new Particle(vx, vy, this.position.x, this.position.y, this.fillColor);
+            var p = new Particle(vx, vy, this.position.x, this.position.y, '#f50');
             model.particles.push(p)
         }
     }

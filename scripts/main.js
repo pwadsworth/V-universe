@@ -92,13 +92,11 @@ function view() {
     model.ship.renderIn(ctx);
     drawHUD();
 
-    
-
     function drawBeams() {
         var beams = model.laserBeams;
         ctx.fillStyle = "red";
         beams.forEach(function (b) {
-            ctx.fillRect(b.position.x, b.position.y, 3, 3)
+            ctx.fillRect(b.position.x, b.position.y, 4, 4)
         });
        ctx.restore();
     }

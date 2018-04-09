@@ -15,7 +15,7 @@ function PlayerShip(x, y, enginePwr, maxSpeed) {
     this.enginePwr = enginePwr || 1;
     this.maxSpeed = maxSpeed || 60;
     this.pwr = 1000;
-    this.fireRate = 150         //one shot every x milliseconds
+    this.fireRate = 100         //one shot every x milliseconds
     this.pwrStr =  function () {///visual representation of pwr
         if (this.pwr <= 0) return "          "; //No power
         for (var power = ""; power.length < this.pwr/100; power+="|") {}
@@ -147,35 +147,28 @@ PlayerShip.prototype.update = function (p) {
 
 PlayerShip.prototype.fire = function () {
     var dT =  Date.now()- this.lastLaser;
-    var beam = {    //Dummy beam to return if there is no power
-                remove: true, 
-                force: function () {return 0},
-                position: new Vector (0,0,0),
-                velocity: this.velocity.add(new Vector(-10,0,0))
-            };
-    if ((this.pwr > 5) && (dT > this.fireRate) ) {
-        this.lastLaser = Date.now()
-        this.pwr -= 5;
-        switch (this.wpnType){
-            case 'double':{
-                //TODO
-                break;
-            }
-            case 'mega': {
-                //TODO
-                break;
-            }
-            case 'basic':
-                var x = 10 * Math.cos(utils.toRadian(this.rotation-90));
-                var y = 15 * Math.sin(utils.toRadian(this.rotation-90));
-                beam = {
-                    remove: false,
-                    force: function () {return 2},
-                    position: this.position,
-                    velocity: this.velocity.add(new Vector(x,y,0))
-                }
-                break;
+    var beam = new Beam(); //Dummy beam to return if there is no power
+    switch (this.wpnType){
+        case 'double':{
+            //TODO
+            break;
         }
-        return beam;
+        case 'mega': {
+            //TODO
+            break;
+        }
+        case 'basic':
+            if ((this.pwr > 50) && (dT > this.fireRate) ) {
+                this.lastLaser = Date.now()
+                this.pwr -= 50;
+                var x = 10*Math.cos(utils.toRadian(this.rotation-90));
+                var y = 15*Math.sin(utils.toRadian(this.rotation-90));
+                beam.velocity = this.velocity.add(new Vector(x,y,0));
+                beam.remove = false;
+                beam.force = function () {return 1};
+                beam.position = this.position;
+            }
+            break;
     }
+    return beam;
 }
