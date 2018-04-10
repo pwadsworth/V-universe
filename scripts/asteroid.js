@@ -42,7 +42,7 @@ function Asteroid( _x, _y, _r, _type) {
         }
         else if (provRoll >= 0.99) { //Pure diamond asteroid at Sammy's request 
             this.type = 'diamond'; 
-            mass *= 1000;
+            mass *= 10;
         }
     }
     if (this.type === 'clay') outline = '#222';

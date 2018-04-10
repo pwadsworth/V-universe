@@ -18,7 +18,7 @@ var astrdMaxSpeed = 1,  //Asteroids max speed factor (x200 km/s)
     };
 
 //GLOBAL SETUP
-var DEBUG = true,         //Debug mode toggle
+var DEBUG = false,         //Debug mode toggle
     utils = new Utils(),
     canvas = document.getElementById('myCanvas'),
     width = window.innerWidth - 25,
@@ -71,13 +71,6 @@ function view() {
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = 'rgb(0,0,0)';
     ctx.fillRect(0, 0, width, height);
-
-   // speed = 0  //map(mouseX, 0, width, 0, 100);
- //   ctx.translate(width / 2, height / 2);
-    // for (var i = 0; i < model.stars.length; i++) {
-    //     model.stars[i].update();
-  //    model.stars[i].show(ctx);
-// }
     ctx.fillStyle = 'rgb(255,255,255)';
     model.stars.forEach(function (s) {
         ctx.fillRect(s.x, s.y, 2, 2)
@@ -131,6 +124,7 @@ function controller(progress) {
     var p = progress / 16
     var s = model.ship
     if (s.remove) {
+        model.ship.explode();
         model.ship = new PlayerShip(width/5, height/2, enginePwr, maxSpeed)
     }
 
