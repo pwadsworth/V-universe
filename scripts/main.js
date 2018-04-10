@@ -191,6 +191,7 @@ function controller(progress) {
                     })
                 }
             });
+            a.isHitBy(model.ship)
         });
         model.cleanUp('asteroids');
 
