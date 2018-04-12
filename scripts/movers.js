@@ -110,8 +110,8 @@ Mover.prototype = {
     explode: function () {   //make particle explosion
         numParticles = this.mass * 3;
         for (var i = 0; i <= numParticles; i++){
-            var vx = Math.random()*6+1;
-            var vy = Math.random()*6+1;
+            var vx = Math.random()*6+0.1;
+            var vy = Math.random()*6+0.1;
             if (Math.random()>=0.5) vx *= -1;
             if (Math.random()>=0.5) vy *= -1;
             var p = new Particle(vx, vy, this.position.x, this.position.y, '#f50');
