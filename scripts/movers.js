@@ -33,7 +33,7 @@ function Mover(x, y, shape, mass, life, outline, fill, rotation, spin, radius) {
     this.shape = shape || [[3, -3], [3, 3], [-3, 0], [3, -3]];
     this.mass = mass || 1;
     this.force = function () {
-        return this.mass * this.velocity.length();
+        return this.mass * (this.velocity.length() || 10);
     }
     this.radius = radius || console.log('Bounding radius value is required for calling ' + this.constructor.toString());
     this.rotation = rotation || 0;
